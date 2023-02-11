@@ -34,8 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .catch(() => {
                     // バリデーションエラーなど
-                    alert("登録に失敗しました");
+                    alert("取得に失敗しました");
                 });
         },
     });
+    calendar.render();
   });
