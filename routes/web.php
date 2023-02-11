@@ -2,7 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-// use App\Http\Controllers\TasksController;
+use App\Http\Controllers\TasksController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,6 +34,10 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/calendar', function () {
         return view('calendar');
     });
+
+    Route::resource('/tasks', TasksController::class, ['only' => ['index', 'store', 'update', 'destroy']]);
+
+    Route::post('/tasks-get', [TasksController::class, 'getTasks'])->name('tasks-get');
 });
 
 require __DIR__.'/auth.php';
