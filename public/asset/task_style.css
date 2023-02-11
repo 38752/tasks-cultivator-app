@@ -1,0 +1,54 @@
+/* ▼カレンダー */
+
+/* ▲カレンダー */
+
+/* ▼ボタン */
+.btn-task {
+  margin-right: 10px;
+}
+/* ▲ボタン */
+
+/* ▼タスク表示 */
+.container {
+  width: 79vw;
+  height: 84vh;
+  overflow-x: scroll;
+}
+.tasks-column {
+  height: 100%;
+  border-right: 1px solid gray;
+  overflow-y: scroll;
+  /* overflow-x: scroll; */
+
+}
+.new-task-card {
+  margin: auto;
+}
+
+.item-group {
+  margin-bottom: 1rem;
+}
+.item-name {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  box-sizing: border-box;
+}
+/* ▲タスク表示 */
+
+/* ▼更新taskフォーム関連 */
+.edit-form {
+  display: none;
+}
+/* ▲更新taskフォーム関連 */
+/* ▼削除フォーム(ボタンのみ)関連 */
+.delete-form {
+  display: inline-block;
+}
+/* ▲削除フォーム(ボタンのみ)関連 */
+/* ▼新規taskフォーム関連 */
+
+.form-text-area {
+  min-height: 3rem;
+}
+/* ▲新規taskフォーム関連 */

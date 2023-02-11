@@ -89,7 +89,6 @@ class TasksController extends Controller
      */
     public function update(TaskRequest $request, $id)
     {
-
         // taskを見つける
         $task = Task::find($id);
 
