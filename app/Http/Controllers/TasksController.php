@@ -14,15 +14,24 @@ class TasksController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        // 自分のtasksを取得
         $user = Auth::user();
         $tasks = Task::whereUserId($user->id)->get();
         $depth = 1;
 
+        // selected_taskを取得
+        if ($request->input('selected_task') != null) {
+            $selected_task = $request->input('selected_task');
+        } else {
+            $selected_task = null;
+        };
+
         return view(
             'task.index', 
-            ['user' => $user, 'tasks' => $tasks, 'depth' => $depth]
+            ['user' => $user, 'tasks' => $tasks,
+             'depth' => $depth, 'selected_task' => $selected_task]
         );
     }
 
@@ -139,6 +148,43 @@ class TasksController extends Controller
         ];
 
         return response()->json(['success' => $success]); //JSONデータをJavaScriptに渡す
+    }
+
+    /**
+     * 該当するタスクを配列で渡す
+     *
+     * @param  Request  $request
+     */
+    public function searchTasks(Request $request)
+    {
+        // 検索語句取得
+        $searchTerm = $request->input('adminlteSearch');
+
+        // ユーザーを取得
+        $user = Auth::user();
+
+        // 正規表現で拾う
+        $tasks = Task::query()
+                    ->whereUserId($user->id)
+                    ->where('title', 'LIKE', "%{$searchTerm}%")
+                    ->get();
+
+
+        if ($request->input('adminlteSearch') == null) {
+            // 検索語句がnullなら422で返す
+            $response['error'] = 'Invalid Request';
+            $response['error_message'] = 'type a search term.';
+            return response()->json($response, 422);
+        };
+        if ($tasks->count() == 0) {
+            // $tasksが空なら422で返す
+            $response['error'] = 'No Data';
+            $response['error_message'] = 'There were no applicable tasks.';
+            return response()->json($response, 422);
+        };
+
+        // jsonで返す
+        return response()->json(['tasks' => $tasks]);
     }
 
     /**

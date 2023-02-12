@@ -1,3 +1,21 @@
 /* @tailwind base; */
 /* @tailwind components; */
 /* @tailwind utilities; */
+
+/* ▼テーブル場所固定で表示 */
+#content-header {
+  position: relative;
+}
+
+#candidate-card {
+  position: absolute;
+  z-index: 10;
+  display: none;
+}
+/* ▲テーブルを場所固定で表示 */
+
+.candidate-detail {
+  max-width: 24rem;
+  overflow: scroll;
+  white-space: nowrap;
+}

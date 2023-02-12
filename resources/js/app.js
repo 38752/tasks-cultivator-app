@@ -5,6 +5,8 @@ import './store_task';
 import './edit_task';
 import './update_task';
 import './delete_task';
+import './search_task';
+import './selsect_task';
 
 import Alpine from 'alpinejs';
 
