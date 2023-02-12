@@ -36,6 +36,7 @@ Route::group(['middleware' => ['auth']], function() {
     });
 
     Route::resource('/tasks', TasksController::class, ['only' => ['index', 'store', 'update', 'destroy']]);
+    Route::get('/tasks/search', [TasksController::class, 'searchTasks'])->name('search-tasks');
 
     Route::post('/tasks-get', [TasksController::class, 'getTasks'])->name('tasks-get');
 });

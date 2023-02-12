@@ -1,4 +1,4 @@
-// 日付を'yyyy-mm-dd'にする関数
+// 日付を'yyyy年mm月dd日'にする関数
 function formatDateForIndex(dt) {
   var y = dt.getFullYear();
   var m = ('00' + (dt.getMonth()+1)).slice(-2);
@@ -6,7 +6,7 @@ function formatDateForIndex(dt) {
   return (y + ' 年' + m + '月' + d+ '日');
 }
 
-// 日付を'yyyy年mm月dd日'にする関数
+// 日付を'yyyy-mm-dd'にする関数
 function formatDateForForm(dt) {
   var y = dt.getFullYear();
   var m = ('00' + (dt.getMonth()+1)).slice(-2);

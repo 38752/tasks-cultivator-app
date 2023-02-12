@@ -293,7 +293,7 @@ return [
         // Navbar items:
         [
             'type'         => 'navbar-search',
-            'text'         => 'タスク検索',
+            'text'         => 'プロジェクト検索',
             'topnav_right' => true,
         ],
 

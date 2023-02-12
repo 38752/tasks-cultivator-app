@@ -24,6 +24,7 @@
 
     {{-- 一覧表示 --}}
     <div class="container">
+        <a href="#" id="selected-task-id-container" data-selected-task-id="{{ ($selected_task != null) ? $selected_task : '' }}"></a>
         {{-- ▼一列 --}}
         <div class="col-4 tasks-column" data-depth="{{ $depth }}">
             {{-- ▼タスク一列 --}}
