@@ -179,7 +179,7 @@ class TasksController extends Controller
         if ($tasks->count() == 0) {
             // $tasksが空なら422で返す
             $response['error'] = 'No Data';
-            $response['error_message'] = 'There were no applicable tasks.';
+            $response['error_message'] = 'There were no applicable projects.';
             return response()->json($response, 422);
         };
 
