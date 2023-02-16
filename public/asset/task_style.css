@@ -23,9 +23,12 @@
   margin: auto;
 }
 
+.card-title {
+  width: 90%;
+}
 .task-title-container {
   display: block;
-  width: 15rem;
+  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
