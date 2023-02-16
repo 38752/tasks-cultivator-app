@@ -31,10 +31,10 @@ class TaskRequest extends FormRequest
         // バリデーションルール
         return [
             'user_id' => 'required',
-            // タイトル。最大値は半角30文字
-            'title' => ['required', 'string', new MaxWordCountValidation(30)],
-            // 詳細。空を許し、最大値は半角240文字
-            'detail' => ['string', new MaxWordCountValidation(240)],
+            // タイトル。最大値は40バイト
+            'title' => ['required', 'string', new MaxWordCountValidation(40)],
+            // 詳細。空を許し、最大値は300バイト
+            'detail' => ['string', new MaxWordCountValidation(300)],
             // 期日
             'start_date' => 'nullable|date',
             // // ↓不要

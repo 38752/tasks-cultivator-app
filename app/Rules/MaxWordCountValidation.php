@@ -26,8 +26,7 @@ class MaxWordCountValidation implements Rule
     public function passes($attribute, $value): bool
     {
         $trim = str_replace(array("\r\n", "\r", "\n"), '', $value);
-        // $Length = strlen($trim);
-        $Length = strlen($value);
+        $Length = strlen($trim);
         return $this->MaxWordCount >= $Length;
     }
 
