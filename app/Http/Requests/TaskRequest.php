@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
+use App\Rules\MaxWordCountValidation;
+
 class TaskRequest extends FormRequest
 {
     /**
@@ -29,10 +31,10 @@ class TaskRequest extends FormRequest
         // バリデーションルール
         return [
             'user_id' => 'required',
-            // タイトル。最大値は13文字
-            'title' => 'required|string|max:13',
-            // 詳細。空を許し、最大値は100文字
-            'detail' => 'string|max:100',
+            // タイトル。最大値は半角30文字
+            'title' => ['required', 'string', new MaxWordCountValidation(30)],
+            // 詳細。空を許し、最大値は半角240文字
+            'detail' => ['string', new MaxWordCountValidation(240)],
             // 期日
             'start_date' => 'nullable|date',
             // // ↓不要
