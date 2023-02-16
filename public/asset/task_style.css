@@ -23,6 +23,14 @@
   margin: auto;
 }
 
+.task-title-container {
+  display: block;
+  width: 15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .item-group {
   margin-bottom: 1rem;
 }
