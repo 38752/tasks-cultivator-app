@@ -1,6 +1,12 @@
 window.addEventListener('load', () => {
+  // 要素を取得
+  const taskIdContainer = document.querySelector('#selected-task-id-container');
+
+  // なければ終わり
+  if (!taskIdContainer) return null;
+
   // selected_taskを取得
-  const taskId = document.querySelector('#selected-task-id-container').dataset.selectedTaskId;
+  const taskId = taskIdContainer.dataset.selectedTaskId;
 
   // 空なら終わり
   if (taskId == '') return null;
