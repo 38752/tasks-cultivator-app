@@ -91,7 +91,7 @@ export class TaskFunctions {
 
         // 各値をセット
         document.querySelector(`.task-title-container[data-task-id="${taskId}"]`).textContent = task.title;
-        document.querySelector(`.task-detail-container[data-task-id="${taskId}"]`).textContent = task.detail;
+        document.querySelector(`.task-detail-container[data-task-id="${taskId}"]`).innerHTML = `${task.detail.split('\n').join('<br />')}`;
         document.querySelector(`.task-start_date-container[data-task-id="${taskId}"]`).textContent = startDate;
 
         return null;

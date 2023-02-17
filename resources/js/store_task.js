@@ -19,7 +19,6 @@ function newTaskHtml(task, depth) {
   const startDate = (task.start_date == null) ? '' : new Date(task.start_date);
   const startDateForIndex =  (startDate == '') ? 'なし' : formatDateForIndex(startDate);
   const startDateForForm = (startDate == '') ? '' : formatDateForForm(startDate);
-  task.detail = task.detail.replace('\n', '<br />');
 
   const html = `
     <div class="col-md task-unit" data-depth="${depth}" data-task-id="${task.id}">
@@ -37,7 +36,7 @@ function newTaskHtml(task, depth) {
             <div class="card-body existing-task-body" style="display: none;" data-task-id="${task.id}">
                 <div class="item-group">
                     <span class="item-name">詳細</span>
-                    <span class="task-detail-container" data-task-id="${task.id}">${task.detail}</span>
+                    <span class="task-detail-container" data-task-id="${task.id}">${task.detail.split('\n').join('<br />')}</span>
                 </div>
                 <div class="item-group">
                     <span class="item-name">期限</span>
