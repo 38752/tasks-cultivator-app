@@ -32,9 +32,9 @@ class TaskRequest extends FormRequest
         return [
             'user_id' => 'required',
             // タイトル。最大値は40バイト
-            'title' => ['required', 'string', new MaxWordCountValidation(40)],
+            'title' => ['required', 'string', new MaxWordCountValidation(40, $this->title)],
             // 詳細。空を許し、最大値は300バイト
-            'detail' => ['string', new MaxWordCountValidation(300)],
+            'detail' => ['string', new MaxWordCountValidation(300, $this->detail)],
             // 期日
             'start_date' => 'nullable|date',
             // // ↓不要

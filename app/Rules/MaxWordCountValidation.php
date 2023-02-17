@@ -11,9 +11,12 @@ class MaxWordCountValidation implements Rule
      *
      * @return void
      */
-    public function __construct(private int $MaxWordCount)
+    public function __construct(private int $MaxWordCount, string $value)
     {
         //
+        $trim = str_replace(array("\r\n", "\r", "\n"), '', $value);
+        $length = strlen($trim);
+        $this->length = $length;
     }
 
     /**
@@ -25,9 +28,7 @@ class MaxWordCountValidation implements Rule
      */
     public function passes($attribute, $value): bool
     {
-        $trim = str_replace(array("\r\n", "\r", "\n"), '', $value);
-        $Length = strlen($trim);
-        return $this->MaxWordCount >= $Length;
+        return $this->MaxWordCount >= $this->length;
     }
 
     /**
@@ -37,6 +38,6 @@ class MaxWordCountValidation implements Rule
      */
     public function message()
     {
-        return "The :attribute must not be greater than {$this->MaxWordCount} bytes.";
+        return "The :attribute must not be greater than {$this->MaxWordCount} bytes.\nYour input is {$this->length} byte(s)";
     }
 }
