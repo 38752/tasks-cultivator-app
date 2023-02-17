@@ -52,6 +52,9 @@ class TaskRequest extends FormRequest
         $user_id =  Auth::id();
         $this->merge(['user_id' => $user_id]);
 
+        $title = (is_null($this->title)) ? '' : $this->title;
+        $this->merge(['title' => $title]);
+
         $detail = (is_null($this->detail)) ? '' : $this->detail;
         $this->merge(['detail' => $detail]);
 

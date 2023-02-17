@@ -38,6 +38,6 @@ class MaxWordCountValidation implements Rule
      */
     public function message()
     {
-        return "The :attribute must not be greater than {$this->MaxWordCount} bytes.\nYour input is {$this->length} byte(s).";
+        return "The :attribute must not be greater than {$this->MaxWordCount} bytes.\nYour input is {$this->length} bytes.";
     }
 }
