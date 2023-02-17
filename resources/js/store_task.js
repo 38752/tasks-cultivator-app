@@ -19,6 +19,7 @@ function newTaskHtml(task, depth) {
   const startDate = (task.start_date == null) ? '' : new Date(task.start_date);
   const startDateForIndex =  (startDate == '') ? 'なし' : formatDateForIndex(startDate);
   const startDateForForm = (startDate == '') ? '' : formatDateForForm(startDate);
+  task.detail = task.detail.replace('\n', '<br />');
 
   const html = `
     <div class="col-md task-unit" data-depth="${depth}" data-task-id="${task.id}">

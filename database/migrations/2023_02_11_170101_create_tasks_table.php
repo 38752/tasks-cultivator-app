@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('user_id')->nullable(false)->comment('ユーザーid');
             $table->string('title')->nullable(false)->comment('タスク名');
-            $table->string('detail')->comment('タスク内容')->nullable(false)->default('');
+            $table->text('detail')->comment('タスク内容')->nullable(false);
             $table->date('start_date')->comment('期限')->nullable();
             $table->date('end_date')->comment('FullCalendar用')->nullable();
             $table->timestamps();
