@@ -7,7 +7,7 @@ export class TaskFunctions {
     taskBtnTool.addEventListener('click', () => {
 
       // 同じ階層の表示を整える
-      let taskCardBodies = document.querySelectorAll(`.tasks-column .card-body`);
+      let taskCardBodies = document.querySelectorAll(`.column-only-tasks .card-body`);
       taskCardBodies.forEach(taskCardBody => {
         if (taskCardBody.dataset.taskId != taskId){
           // 全体を整形
