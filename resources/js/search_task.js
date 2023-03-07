@@ -1,10 +1,4 @@
-// 日付を'yyyy年mm月dd日'にする関数
-function formatDateForIndex(dt) {
-  var y = dt.getFullYear();
-  var m = ('00' + (dt.getMonth()+1)).slice(-2);
-  var d = ('00' + dt.getDate()).slice(-2);
-  return (y + ' 年' + m + '月' + d+ '日');
-}
+import { formatDateForIndex } from './task_functions';
 
 function constructTBody(tasks) {
   let html = ``;

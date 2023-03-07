@@ -1,3 +1,5 @@
+import { closeATask, editChildTasksColumns } from './task_functions';
+
 // あるタスクが開かれたら、既に開かれているタスクは閉じる
 document.addEventListener('DOMContentLoaded', () => {
   // ツールボタンを取得
@@ -7,9 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (taskBtnTools.length == 0) return null;
 
   taskBtnTools.forEach(taskBtnTool => {
-    import('./task_functions.js').then(module => {
-      var f = new module.TaskFunctions();
-      f.closeATask(taskBtnTool);
-    });
+    closeATask(taskBtnTool);
+    editChildTasksColumns(taskBtnTool);
   });
+
 });

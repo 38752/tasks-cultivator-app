@@ -1,3 +1,5 @@
+import { updateTask } from './task_functions';
+
 document.addEventListener('DOMContentLoaded', () => {
   // 更新ボタンを取得
   const updateButtons = document.querySelectorAll('.btn-update');
@@ -7,9 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // イベントをセット
   updateButtons.forEach(updateButton => {
-    import('./task_functions.js').then(module => {
-      var f = new module.TaskFunctions();
-      f.updateTask(updateButton);
-    });
+      updateTask(updateButton);
   });
 });

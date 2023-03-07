@@ -1,3 +1,5 @@
+import { destroyTask } from './task_functions';
+
 document.addEventListener('DOMContentLoaded', () => {
   // 削除ボタンを取得
   const deleteButtons = document.querySelectorAll('.btn-delete');
@@ -7,9 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // イベントをセット
   deleteButtons.forEach(deleteButton => {
-    import('./task_functions.js').then(module => {
-      var f = new module.TaskFunctions();
-      f.destroyTask(deleteButton);
-    });
+    destroyTask(deleteButton);
   });
 });

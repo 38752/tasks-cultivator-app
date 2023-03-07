@@ -23,7 +23,7 @@
     @endif
 
     {{-- 一覧表示 --}}
-    <div class="container">
+    <div class="container tasks-all-container">
         <a href="#" id="selected-task-id-container" data-selected-task-id="{{ ($selected_task != null) ? $selected_task : '' }}"></a>
         {{-- ▼一列 --}}
         <div class="col-4 tasks-column" data-depth="{{ $depth }}">
@@ -37,12 +37,13 @@
                                     <span class="task-title-container" data-task-id="{{ $task->id }}">{{ $task->title }}</span>
                                 </h3>
                                 <div class="card-tools">
-                                    <button type="button" class="btn btn-tool task-btn-tool" data-card-widget="collapse" data-task-id="{{ $task->id }}"><i class="fas fa-plus" data-task-id="{{ $task->id }}"></i>
+                                    <button type="button" class="btn btn-tool task-btn-tool" data-card-widget="collapse" data-depth="{{ $depth }}" data-task-id="{{ $task->id }}" data-condition="closed">
+                                        <i class="fas fa-plus" data-task-id="{{ $task->id }}"></i>
                                     </button>
                                 </div>
                             </div>
                             {{-- ▼隠れてるタスク --}}
-                            <div class="card-body existing-task-body" style="display: none;" data-task-id="{{ $task->id }}">
+                            <div class="card-body existing-task-body" style="display: none;" data-depth="{{ $depth }}" data-task-id="{{ $task->id }}">
                                 <div class="item-group">
                                     <span class="item-name">詳細</span>
                                     <span class="task-detail-container" data-task-id="{{ $task->id }}">{!!nl2br(e($task->detail))!!}</span>
@@ -65,7 +66,7 @@
                                         <form action="/tasks/{{ $task->id }}" method="post" class="delete-form">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-info btn-sm btn-task btn-delete" data-task-id="{{ $task->id }}"
+                                            <button type="submit" class="btn btn-info btn-sm btn-task btn-delete" data-depth="{{ $depth }}" data-task-id="{{ $task->id }}"
                                                 >完了・削除</button>
                                         </form>
                                     </div>
@@ -73,7 +74,7 @@
                             </div>
                             {{-- ▲隠れてるタスク --}}
                             {{-- ▼編集フォーム --}}
-                            <div class="card-body" style="display: none;" data-task-id="{{ $task->id }}">
+                            <div class="card-body" style="display: none;" data-depth="{{ $depth }}" data-task-id="{{ $task->id }}">
                                 <form action="/tasks/{{ $task->id }}" method="post" class="edit-form" data-task-id="{{ $task->id }}">
                                 @csrf
                                 @method('PATCH')
