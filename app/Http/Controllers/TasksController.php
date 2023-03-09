@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Models\TasksRelation;
 use App\Http\Requests\TaskRequest;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,7 +19,14 @@ class TasksController extends Controller
     {
         // 自分のtasksを取得
         $user = Auth::user();
-        $tasks = Task::whereUserId($user->id)->get();
+        $project_ids = TasksRelation::query()
+                        ->where('depth', '=', 1)
+                        ->whereColumn('parent_task_id', '=', 'child_task_id')
+                        ->pluck('parent_task_id')
+                        ->toArray();
+        $projects = Task::whereUserId($user->id)
+                    ->whereIn('id', $project_ids)
+                    ->get();
         $depth = 1;
 
         // selected_taskを取得
@@ -29,8 +37,8 @@ class TasksController extends Controller
         };
 
         return view(
-            'task.index', 
-            ['user' => $user, 'tasks' => $tasks,
+            'task.index',
+            ['user' => $user, 'projects' => $projects,
              'depth' => $depth, 'selected_task' => $selected_task]
         );
     }
@@ -62,9 +70,35 @@ class TasksController extends Controller
         $success = [
             'task' => $task,
         ];
-    
-        // // 一覧へ戻り完了メッセージを表示
-        return response()->json(['success' => $success]); //JSONデータをJavaScriptに渡す
+
+        // 親タスクidを取得
+        $parent_task_id = $request->input('parent_task_id');
+
+        // 親タスクの紐づきを上の階層から順に拾う
+        $parent_relations = TasksRelation::query()
+        ->where('child_task_id', '=', $parent_task_id)
+        ->orderBy('depth', 'asc')
+        ->get();
+
+        // 親idを元に自身に追加していく
+        foreach($parent_relations as $parent_relation) {
+            $tasks_relation = new TasksRelation;
+            $tasks_relation->fill([
+                'parent_task_id' => $parent_relation->parent_task_id,
+                'child_task_id' => $task->id,
+                'depth' => $parent_relation->depth,
+            ])->save();
+        };
+        // 自身のidでも作成
+        $tasks_relation = new TasksRelation;
+        $tasks_relation->fill([
+            'parent_task_id' => $task->id,
+            'child_task_id' => $task->id,
+            'depth' => ($parent_relations->count() + 1)
+        ])->save();
+
+        // 一覧へ戻り完了メッセージを表示
+        return response()->json(['success' => $success, 'parentRelations' => $parent_relations, 'selfRelation' => $tasks_relation]); //JSONデータをJavaScriptに渡す
     }
 
     /**

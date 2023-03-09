@@ -54,43 +54,43 @@ export function editChildTasksColumns(taskBtnTool) {
 
       // htmlを用意
       const html =`
-        <div class="col-4 tasks-column" data-depth="${taskDepth + 1}">
-          <div class="column-only-tasks" data-depth="${taskDepth + 1}">
-            <div class="col-md new-form-area" data-depth="${taskDepth + 1}">
-              <div class="card card-outline card-primary collapsed-card" data-depth="${taskDepth + 1}">
-                  <div class="card-header">
-                      <h3 class="card-title">新規登録</h3>
-                      <div class="card-tools">
-                          <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
-                          </button>
-                      </div>
-                  </div>
-                  <div class="card-body" style="display: none;">
-                      <form action="/tasks" method="post">
-                          <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
-                              <div class="form-group">
-                                  <label for="title">タイトル</label>
-                                  <input type="text" class="form-control" id="title" name="title"
-                                      placeholder="タスク名" />
-                              </div>
-                              <div class="form-group">
-                                  <label for="detail">詳細</label>
-                                  <textarea name="detail" id="detail" cols="30" rows="1.5"
-                                      placeholder="詳細" class="form-control form-text-area"></textarea>
-                              </div>
-                              <div class="form-group">
-                                  <label for="start_date">期限</label>
-                                  <input type="date" class="form-control" id="start_date" name="start_date"
-                                  />
-                              </div>
-                              <div class="row">
-                                  <div class="ml-auto">
-                                      <button type="submit" class="btn btn-primary btn-task btn-store">登録</button>
-                                  </div>
-                              </div>
-                      </form>
-                  </div>
-              </div>
+        <div class="col-4 tasks-column" data-depth="${taskDepth + 1}" data-parent-task-id=${taskBtnTool.dataset.taskId}>
+          <div class="column-only-tasks" data-depth="${taskDepth + 1}" data-parent-task-id=${taskBtnTool.dataset.taskId}>
+          </div>
+          <div class="col-md new-form-area" data-depth="${taskDepth + 1}">
+            <div class="card card-outline card-primary collapsed-card" data-depth="${taskDepth + 1}">
+                <div class="card-header">
+                    <h3 class="card-title">新規登録</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body" style="display: none;">
+                    <form action="/tasks" method="post" data-depth="${taskDepth + 1}">
+                        <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
+                            <div class="form-group">
+                                <label for="title">タイトル</label>
+                                <input type="text" class="form-control" id="title" name="title"
+                                    placeholder="タスク名" />
+                            </div>
+                            <div class="form-group">
+                                <label for="detail">詳細</label>
+                                <textarea name="detail" id="detail" cols="30" rows="1.5"
+                                    placeholder="詳細" class="form-control form-text-area"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="start_date">期限</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date"
+                                />
+                            </div>
+                            <div class="row">
+                                <div class="ml-auto">
+                                    <button type="submit" class="btn btn-primary btn-task btn-store" data-depth="${taskDepth + 1}">登録</button>
+                                </div>
+                            </div>
+                    </form>
+                </div>
             </div>
           </div>
         </div>
@@ -133,8 +133,14 @@ export function taskStore(storeButton) {
     e.preventDefault();
     const form = storeButton.parentElement.parentElement.parentElement;
     const formData = new FormData(form);
+
+    // タスクidをurlに乗せて送信
+    const newTaskDepth = Number(storeButton.dataset.depth);
+    const parentTaskId = (newTaskDepth > 1) ? document.querySelector(`div[class="col-4 tasks-column"][data-depth="${newTaskDepth}"]`).dataset.parentTaskId : '0';
+    const url = `/tasks?parent_task_id=${parentTaskId}`;
+
     const XHR = new XMLHttpRequest();
-    XHR.open("POST", `/tasks`, true);
+    XHR.open("POST", url, true);
     XHR.responseType = "json";
     XHR.send(formData);
     XHR.onload = () => {
@@ -152,7 +158,8 @@ export function taskStore(storeButton) {
       };
 
       // フォームを初期状態に戻す
-      const depth = 1;
+      const depth = XHR.response.selfRelation.depth;
+      debugger
       const formArea = document.querySelector(`.new-form-area[data-depth="${depth}"]`);
       form.reset();
 

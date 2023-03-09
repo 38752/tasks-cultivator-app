@@ -29,44 +29,44 @@
         <div class="col-4 tasks-column" data-depth="{{ $depth }}">
             {{-- ▼タスク一列 --}}
             <div class="column-only-tasks" data-depth="{{ $depth }}">
-                @foreach ($tasks as $task)
-                    <div class="col-md task-unit" data-depth="{{ $depth }}" data-task-id="{{ $task->id }}">
-                        <div class="card card-outline card-success collapsed-card" data-depth="{{ $depth }}" data-task-id="{{ $task->id }}">
+                @foreach ($projects as $project)
+                    <div class="col-md task-unit" data-depth="{{ $depth }}" data-task-id="{{ $project->id }}">
+                        <div class="card card-outline card-success collapsed-card" data-depth="{{ $depth }}" data-task-id="{{ $project->id }}">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    <span class="task-title-container" data-task-id="{{ $task->id }}">{{ $task->title }}</span>
+                                    <span class="task-title-container" data-task-id="{{ $project->id }}">{{ $project->title }}</span>
                                 </h3>
                                 <div class="card-tools">
-                                    <button type="button" class="btn btn-tool task-btn-tool" data-card-widget="collapse" data-depth="{{ $depth }}" data-task-id="{{ $task->id }}" data-condition="closed">
-                                        <i class="fas fa-plus" data-task-id="{{ $task->id }}"></i>
+                                    <button type="button" class="btn btn-tool task-btn-tool" data-card-widget="collapse" data-depth="{{ $depth }}" data-task-id="{{ $project->id }}" data-condition="closed">
+                                        <i class="fas fa-plus" data-task-id="{{ $project->id }}"></i>
                                     </button>
                                 </div>
                             </div>
                             {{-- ▼隠れてるタスク --}}
-                            <div class="card-body existing-task-body" style="display: none;" data-depth="{{ $depth }}" data-task-id="{{ $task->id }}">
+                            <div class="card-body existing-task-body" style="display: none;" data-depth="{{ $depth }}" data-task-id="{{ $project->id }}">
                                 <div class="item-group">
                                     <span class="item-name">詳細</span>
-                                    <span class="task-detail-container" data-task-id="{{ $task->id }}">{!!nl2br(e($task->detail))!!}</span>
+                                    <span class="task-detail-container" data-task-id="{{ $project->id }}">{!!nl2br(e($project->detail))!!}</span>
                                 </div>
                                 <div class="item-group">
                                     <span class="item-name">期限</span>
-                                    <span class="task-start_date-container" data-task-id="{{ $task->id }}">
-                                        @if (!($task->start_date === null))
-                                            {{ date('Y年m月d日', strtotime($task->start_date)) }}
+                                    <span class="task-start_date-container" data-task-id="{{ $project->id }}">
+                                        @if (!($project->start_date === null))
+                                            {{ date('Y年m月d日', strtotime($project->start_date)) }}
                                         @else
                                             {{ "なし" }}
-                                            {{-- $task->start_date = '' --}}
+                                            {{-- $project->start_date = '' --}}
                                         @endif
                                     </span>
                                 </div>
                                 <div class="row">
                                     <div class="ml-auto">
-                                        <button type="button" class="btn btn-secondary btn-sm btn-task btn-edit" data-task-id="{{ $task->id }}"
+                                        <button type="button" class="btn btn-secondary btn-sm btn-task btn-edit" data-task-id="{{ $project->id }}"
                                             >編集</button>
-                                        <form action="/tasks/{{ $task->id }}" method="post" class="delete-form">
+                                        <form action="/tasks/{{ $project->id }}" method="post" class="delete-form">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-info btn-sm btn-task btn-delete" data-depth="{{ $depth }}" data-task-id="{{ $task->id }}"
+                                            <button type="submit" class="btn btn-info btn-sm btn-task btn-delete" data-depth="{{ $depth }}" data-task-id="{{ $project->id }}"
                                                 >完了・削除</button>
                                         </form>
                                     </div>
@@ -74,32 +74,32 @@
                             </div>
                             {{-- ▲隠れてるタスク --}}
                             {{-- ▼編集フォーム --}}
-                            <div class="card-body" style="display: none;" data-depth="{{ $depth }}" data-task-id="{{ $task->id }}">
-                                <form action="/tasks/{{ $task->id }}" method="post" class="edit-form" data-task-id="{{ $task->id }}">
+                            <div class="card-body" style="display: none;" data-depth="{{ $depth }}" data-task-id="{{ $project->id }}">
+                                <form action="/tasks/{{ $project->id }}" method="post" class="edit-form" data-task-id="{{ $project->id }}">
                                 @csrf
                                 @method('PATCH')
                                     {{-- タイトル入力 --}}
                                     <div class="form-group">
                                         <label for="title">タイトル</label>
-                                        <input type="text" class="form-control" id="title" name="title" value="{{ old('title', $task->title) }}"
+                                        <input type="text" class="form-control" id="title" name="title" value="{{ old('title', $project->title) }}"
                                             placeholder="タスク名" />
                                     </div>
                                     {{-- 詳細入力(テキスト) --}}
                                     <div class="form-group">
                                         <label for="detail">詳細</label>
                                         <textarea name="detail" id="detail" cols="30" rows="1.5"
-                                            placeholder="詳細" class="form-control form-text-area">{{ $task->detail }}</textarea>
+                                            placeholder="詳細" class="form-control form-text-area">{{ $project->detail }}</textarea>
                                     </div>
                                     {{-- 期限入力 --}}
                                     <div class="form-group">
                                         <label for="start_date">期限</label>
                                         <input type="date" class="form-control" id="start_date" name="start_date"
-                                            value="{{ (isset($task->start_date)) ? date('Y-m-d', strtotime($task->start_date)) : ''; }}"
+                                            value="{{ (isset($project->start_date)) ? date('Y-m-d', strtotime($project->start_date)) : ''; }}"
                                              />
                                     </div>
                                     <div class="row">
                                         <div class="ml-auto">
-                                            <button type="submit" class="btn btn-primary btn-task btn-update" data-task-id="{{ $task->id }}">更新</button>
+                                            <button type="submit" class="btn btn-primary btn-task btn-update" data-task-id="{{ $project->id }}">更新</button>
                                         </div>
                                     </div>
                                 </form>
@@ -124,7 +124,7 @@
                     </div>
                     {{-- ▼隠れてるフォーム --}}
                     <div class="card-body" style="display: none;">
-                        <form action="{{ route('tasks.store') }}" method="post">
+                        <form action="{{ route('tasks.store') }}" method="post" data-depth="{{ $depth }}">
                             @csrf
                                 {{-- タイトル入力 --}}
                                 <div class="form-group">
@@ -146,7 +146,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="ml-auto">
-                                        <button type="submit" class="btn btn-primary btn-task btn-store">登録</button>
+                                        <button type="submit" class="btn btn-primary btn-task btn-store" data-depth="{{ $depth }}">登録</button>
                                     </div>
                                 </div>
                         </form>
