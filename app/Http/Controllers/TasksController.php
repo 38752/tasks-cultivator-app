@@ -174,8 +174,61 @@ class TasksController extends Controller
             return response()->json( $response, 422 );
         };
 
+                // 子があるか検証
+        $task_relations = TasksRelation::query()
+                            ->where('parent_task_id', '=', $id)
+                            ->get();
+        $task_relations_count = $task_relations->count();
+        if ($task_relations_count > 1) {
+            $response['statusText']  = 'Consistency Error';
+            $response['errors']  = ['Undeletable task' => ['It is unable to delete tasks having children.']];
+            return response()->json( $response, 422 );
+        }
+
         // 削除
         $task->delete();
+
+        // 関係も削除
+        foreach ($task_relations as $task_relation) {
+            $task_relation->delete();
+        }
+
+        $success = [
+            'task' => $task,
+        ];
+
+        return response()->json(['success' => $success]); //JSONデータをJavaScriptに渡す
+    }
+
+    /**
+     * Confirm if it is able to remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function preDestroy($id)
+    {
+        // taskを見つける
+        $task = Task::find($id);
+
+        // ユーザー認証
+        $user = Auth::user();
+        if ($task->user_id != $user->id) {
+            $response['statusText']  = 'Authorization Error';
+            $response['errors']  = ['user' => ['The user must not be different from the registrant.']];
+            return response()->json( $response, 422 );
+        };
+
+        // 子があるか検証
+        $task_relations = TasksRelation::query()
+                            ->where('parent_task_id', '=', $id)
+                            ->get();
+        $task_relations_count = $task_relations->count();
+        if ($task_relations_count > 1) {
+            $response['statusText']  = 'integrity Error';
+            $response['errors']  = ['Undeletable task' => ['It is unable to delete tasks having children.']];
+            return response()->json( $response, 422 );
+        }
 
         $success = [
             'task' => $task,
