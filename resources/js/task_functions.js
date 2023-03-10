@@ -38,6 +38,7 @@ export function closeATask(taskBtnTool) {
 
 export function editChildTasksColumns(taskBtnTool) {
   const taskDepth = Number(taskBtnTool.dataset.depth);
+  const parentTaskId = Number(taskBtnTool.dataset.taskId);
 
   taskBtnTool.addEventListener('click', () => {
     const childTasksColumns = document.querySelectorAll(`.tasks-column`);
@@ -51,60 +52,84 @@ export function editChildTasksColumns(taskBtnTool) {
     // タスクが開かれたなら子タスクの列を表示
     if (taskBtnTool.dataset.condition === 'open') {
       // XHRで子を配列で取得
-      
-
-      // htmlを用意
-      const html =`
-        <div class="col-4 tasks-column" data-depth="${taskDepth + 1}" data-parent-task-id=${taskBtnTool.dataset.taskId}>
-          <div class="column-only-tasks" data-depth="${taskDepth + 1}" data-parent-task-id=${taskBtnTool.dataset.taskId}>
-          </div>
-          <div class="col-md new-form-area" data-depth="${taskDepth + 1}">
-            <div class="card card-outline card-primary collapsed-card" data-depth="${taskDepth + 1}">
-                <div class="card-header">
-                    <h3 class="card-title">新規登録</h3>
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body" style="display: none;">
-                    <form action="/tasks" method="post" data-depth="${taskDepth + 1}">
-                        <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
-                            <div class="form-group">
-                                <label for="title">タイトル</label>
-                                <input type="text" class="form-control" id="title" name="title"
-                                    placeholder="タスク名" />
-                            </div>
-                            <div class="form-group">
-                                <label for="detail">詳細</label>
-                                <textarea name="detail" id="detail" cols="30" rows="1.5"
-                                    placeholder="詳細" class="form-control form-text-area"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="start_date">期限</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date"
-                                />
-                            </div>
-                            <div class="row">
-                                <div class="ml-auto">
-                                    <button type="submit" class="btn btn-primary btn-task btn-store" data-depth="${taskDepth + 1}">登録</button>
-                                </div>
-                            </div>
-                    </form>
-                </div>
+      const XHR = new XMLHttpRequest();
+      const url = `/tasks/${parentTaskId}/child_tasks`;
+      XHR.open("GET", url, true);
+      XHR.responseType = "json";
+      XHR.send();
+      XHR.onload = () => {
+        // htmlを用意
+        const html =`
+          <div class="col-4 tasks-column" data-depth="${taskDepth + 1}" data-parent-task-id=${taskBtnTool.dataset.taskId}>
+            <div class="column-only-tasks" data-depth="${taskDepth + 1}" data-parent-task-id=${taskBtnTool.dataset.taskId}>
+            </div>
+            <div class="col-md new-form-area" data-depth="${taskDepth + 1}">
+              <div class="card card-outline card-primary collapsed-card" data-depth="${taskDepth + 1}">
+                  <div class="card-header">
+                      <h3 class="card-title">新規登録</h3>
+                      <div class="card-tools">
+                          <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                          </button>
+                      </div>
+                  </div>
+                  <div class="card-body" style="display: none;">
+                      <form action="/tasks" method="post" data-depth="${taskDepth + 1}">
+                          <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
+                              <div class="form-group">
+                                  <label for="title">タイトル</label>
+                                  <input type="text" class="form-control" id="title" name="title"
+                                      placeholder="タスク名" />
+                              </div>
+                              <div class="form-group">
+                                  <label for="detail">詳細</label>
+                                  <textarea name="detail" id="detail" cols="30" rows="1.5"
+                                      placeholder="詳細" class="form-control form-text-area"></textarea>
+                              </div>
+                              <div class="form-group">
+                                  <label for="start_date">期限</label>
+                                  <input type="date" class="form-control" id="start_date" name="start_date"
+                                  />
+                              </div>
+                              <div class="row">
+                                  <div class="ml-auto">
+                                      <button type="submit" class="btn btn-primary btn-task btn-store" data-depth="${taskDepth + 1}">登録</button>
+                                  </div>
+                              </div>
+                      </form>
+                  </div>
+              </div>
             </div>
           </div>
-        </div>
-      `;
-      // 並べる
-      childTasksColumns[0].parentElement.insertAdjacentHTML('beforeend', html);
+        `;
+        // 並べる
+        childTasksColumns[0].parentElement.insertAdjacentHTML('beforeend', html);
 
-      // 登録ボタンを取得
-      const storeButtons = document.querySelectorAll('.btn-store');
-      if (storeButtons.length == 0) return null;
-      const storeButton = storeButtons[storeButtons.length - 1];
-      // 登録ボタンにイベントをセット
-      taskStore(storeButton);
+        // 新規登録ボタンを取得
+        const storeButtons = document.querySelectorAll('.btn-store');
+        if (storeButtons.length == 0) return null;
+        const storeButton = storeButtons[storeButtons.length - 1];
+        // 新規登録ボタンにイベントをセット
+        taskStore(storeButton);
+
+        // レスポンスに失敗したら子タスクは表示させない
+        if (XHR.status != 200) {
+          // レスポンスに失敗した時
+          alert(`Response Error ${XHR.status}: ${XHR.statusText}`);
+          return null;
+        };
+
+        // 子タスクを順に挿入
+        const childTasks = XHR.response.childTasks;
+
+        // 差し込みエリアを取得
+        const insertArea = document.querySelector(`.column-only-tasks[data-depth="${taskDepth + 1}"]`);
+
+        // 順に差し込み&イベントをセット
+        childTasks.forEach(childTask => {
+          insertArea.insertAdjacentHTML('beforeend', newTaskHtml(childTask, taskDepth + 1));
+          buildNewTask(childTask);
+        });
+      };
     };
   });
 };
@@ -166,7 +191,7 @@ export function taskStore(storeButton) {
       // 作成したタスクを差し込み
       const task = XHR.response.success.task;
 
-      // 要素を差し込み
+      // 差し込みエリアを取得、差し込み
       const insertArea = document.querySelector(`.column-only-tasks[data-depth="${depth}"]`);
       insertArea.insertAdjacentHTML('beforeend', newTaskHtml(task, depth));
 

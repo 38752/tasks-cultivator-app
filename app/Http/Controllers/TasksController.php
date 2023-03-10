@@ -44,6 +44,31 @@ class TasksController extends Controller
     }
 
     /**
+     * 子タスクを配列で渡す
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getChildTasks($id)
+    {
+        $parent_task_depth = TasksRelation::query()
+                                ->where('parent_task_id', '=', $id)
+                                ->whereColumn('parent_task_id', '=', 'child_task_id')
+                                ->first()
+                                ->depth;
+        $child_task_ids = TasksRelation::query()
+                            ->where('parent_task_id', '=', $id)
+                            ->where('depth', '=', $parent_task_depth)
+                            ->whereColumn('parent_task_id', '!=', 'child_task_id')
+                            ->pluck('child_task_id')
+                            ->toArray();
+        $child_tasks = Task::query()
+                        ->where('id', '=', $child_task_ids)
+                        ->get();
+        return response()->json(['childTasks' => $child_tasks]); //JSONデータをJavaScriptに渡す
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response

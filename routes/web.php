@@ -38,6 +38,7 @@ Route::group(['middleware' => 'basicauth'], function() {
         });
 
         Route::resource('/tasks', TasksController::class, ['only' => ['index', 'store', 'update', 'destroy']]);
+        Route::get('/tasks/{task}/child_tasks', [TasksController::class, 'getChildTasks'])->name('get-child-tasks');
         Route::get('/tasks/search', [TasksController::class, 'searchTasks'])->name('search-tasks');
         Route::get('/tasks/{task}/pre_destroy', [TasksController::class, 'preDestroy'])->name('pre-destroy-a-task');
 
