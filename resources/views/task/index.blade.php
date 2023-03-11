@@ -8,9 +8,6 @@
 @section('meta_tags')
     <meta name="page-category" content="individual-projects">
     {{-- ↑今後プロジェクト共有機能を追加する可能性も踏まえて --}}
-    @foreach ($selected_task_relations as $selected_task_relation)
-        <meta name="selected-task-route" content="{{ $selected_task_relation->parent_task_id }}">
-    @endforeach
 @stop
 
 @section('title', 'プロジェクト')

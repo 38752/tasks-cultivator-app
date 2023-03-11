@@ -468,13 +468,30 @@ export function constructSearchResults(tasks) {
                     ${startDateForIndex}
                 </td>
                 <td>
-                    <a href="/tasks?selected_task=${task.id}" class="text-muted">
+                    <span class="text-muted btn-select" data-task-id="${task.id}">
                         <i class="fas fa-search"></i>
-                    </a>
+                    </span>
                 </td>
             </tr>`;
   });
   return html;
+}
+
+export function selectTasks(selectButton) {
+  selectButton.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    // 候補一覧を非表示
+    const crossButton = document.querySelector('button[data-widget="navbar-search"]');
+    crossButton.click();
+
+    const taskId = selectButton.dataset.taskId;
+
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const url = `/tasks/construct?_token=${token}&selected_task_id=${taskId}`;
+
+    drawTasks(url);
+  });
 }
 
 export function searchTasks(searchButton) {
@@ -502,9 +519,15 @@ export function searchTasks(searchButton) {
         return null;
       };
       const CandidateTBody = document.querySelector('#candidate-tbody');
-      CandidateTBody.innerHTML = constructSearchResults(tasks);
+      const html = constructSearchResults(tasks);
+      CandidateTBody.innerHTML = html;
       const candidateCard = document.querySelector('#candidate-card');
       candidateCard.setAttribute('style', 'display: block;');
+
+      const selectButtons = document.querySelectorAll('.btn-select');
+      selectButtons.forEach(selectButton => {
+        selectTasks(selectButton);
+      });
     };
   });
 }
@@ -520,69 +543,60 @@ export function directOpenATask(taskId) {
   taskUnit.children[0].children[1].setAttribute('style', "display: block;");
 };
 
-export function drawTasks() {
-  // 展開適用範囲かを確認し、"individual-projects"でなければ終わり
-  const projectType = document.querySelector('meta[name="page-category"]').getAttribute('content');
-  if (projectType != "individual-projects") return null;
-
-  // ルートの要素を取得する(なくてもからの配列が与えられる)
-  const routeMeta = document.querySelectorAll('meta[name="selected-task-route"]');
-
-  // XHR送る準備
-  let route = [];
-  routeMeta.forEach(branch => {
-    route.push(Number(branch.getAttribute('content')));
-  });
-  const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-  const url = `/tasks/construct?_token=${token}&route=${route}`;
-
-  const XHR = new XMLHttpRequest();
-  XHR.open("GET", url, true);
-  XHR.responseType = "json";
-  XHR.send();
-
-  XHR.onload = () => {
-    // 一列の差し込みエリアを取得
-    const columnInsertArea = document.querySelector('#tasks-all-container');
-
-    // タスク構造を定数structureに入れる
-    const structure = XHR.response.structure;
-
-    let i = 0;
-    let depth = 1;
-    const parentTaskIds = [0].concat(route);
-    structure.forEach(tasksInAColumn => {
-      // 一列のhtmlを差し込み
+export function drawTasks(url) {
+    const XHR = new XMLHttpRequest();
+    XHR.open("GET", url, true);
+    XHR.responseType = "json";
+    XHR.send();
+  
+    XHR.onload = () => {
+      // 一列の差し込みエリアを取得し、一旦空にする
+      const columnInsertArea = document.querySelector('#tasks-all-container');
       columnInsertArea.innerHTML = '';
-      columnInsertArea.insertAdjacentHTML('beforeend', newTaskColumnHtml(depth, parentTaskIds[i]));
+  
+      if (XHR.status != 200) {
+        // レスポンスに失敗した時
+        alert(`Response Error ${XHR.status}: ${XHR.statusText}`);
+        return null;
+      };
+  
+      // タスク構造を定数structureに入れる
+      const structure = XHR.response.structure;
+      const route = XHR.response.route;
+  
+      let i = 0;
+      let depth = 1;
+      const parentTaskIds = [0].concat(route);
+      structure.forEach(tasksInAColumn => {
+        // 一列のhtmlを差し込み
+        columnInsertArea.insertAdjacentHTML('beforeend', newTaskColumnHtml(depth, parentTaskIds[i]));
+  
+        // 差し込んだ列にtasks差し込み
+        tasksInAColumn.forEach(task => {
+          // タスクの差し込みエリアを取得
+          let taskInsertArea = document.querySelector(`.column-only-tasks[data-depth="${depth}"]`);
+          // 差し込み
+          taskInsertArea.insertAdjacentHTML('beforeend', newTaskHtml(task, depth));
+          // 各種イベントをセット
+          buildNewTask(task);
+  
+          // route上のタスクの場合は開く
+          if (task.id === route[i]) {
+            directOpenATask(task.id);
+          }
+        });
 
-      // 差し込んだ列にtasks差し込み
-      tasksInAColumn.forEach(task => {
-        // タスクの差し込みエリアを取得
-        let taskInsertArea = document.querySelector(`.column-only-tasks[data-depth="${depth}"]`);
-        // 差し込み
-        taskInsertArea.insertAdjacentHTML('beforeend', newTaskHtml(task, depth));
-        // 各種イベントをセット
-        buildNewTask(task);
-
-        // route上のタスクの場合は開く
-        if (task.id === route[i]) {
-          directOpenATask(task.id);
-        }
+        i ++;
+        depth ++;
       });
-
-
-      i ++;
-      depth ++;
-    });
-
-    // 新規登録ボタンを取得
-    const storeButtons = document.querySelectorAll('.btn-store');
-    if (storeButtons.length == 0) return null;
-    // 新規登録ボタンにイベントをセット
-    storeButtons.forEach(storeButton => {
-      taskStore(storeButton);
-    });
-  };
+  
+      // 新規登録ボタンを取得
+      const storeButtons = document.querySelectorAll('.btn-store');
+      if (storeButtons.length == 0) return null;
+      // 新規登録ボタンにイベントをセット
+      storeButtons.forEach(storeButton => {
+        taskStore(storeButton);
+      });
+    };
 };
 // ------------------------------------▲全体を描画▲------------------------------------
