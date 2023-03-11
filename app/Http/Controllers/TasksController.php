@@ -27,20 +27,61 @@ class TasksController extends Controller
         $projects = Task::whereUserId($user->id)
                     ->whereIn('id', $project_ids)
                     ->get();
-        $depth = 1;
 
-        // selected_taskを取得
+        // selected_task_relationsを取得
         if ($request->input('selected_task') != null) {
             $selected_task = $request->input('selected_task');
+            $selected_task_relations = TasksRelation::query()
+                                        ->where('child_task_id', '=', $selected_task)
+                                        ->orderBy('depth', 'asc')
+                                        ->get();
         } else {
-            $selected_task = null;
+            $selected_task_relations = [];
         };
 
         return view(
             'task.index',
             ['user' => $user, 'projects' => $projects,
-             'depth' => $depth, 'selected_task' => $selected_task]
+             'selected_task_relations' => $selected_task_relations]
         );
+    }
+
+    /**
+     * ルートが指定されている場合は、関連する子タスクも含めて返す
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function construct(Request $request)
+    {
+        // 自分のtasksを取得
+        $user = Auth::user();
+        $route = $request->route == null ? [] : explode(',', $request->route);
+        $structure = []; // ここに必要な全てのタスクを入れる([depth_1の配列, depth_2の配列, ...])
+
+        // まずプロジェクトを配列で拾う
+        $project_ids = TasksRelation::query()
+                        ->where('depth', '=', 1)
+                        ->whereColumn('parent_task_id', '=', 'child_task_id')
+                        ->pluck('parent_task_id')
+                        ->toArray();
+        $projects = Task::query()
+                        ->whereUserId($user->id)
+                        ->whereIn('id', $project_ids)
+                        ->get();
+
+        // $structureに追加
+        $structure[] = $projects;
+
+        // 順に子タスクを配列で拾って$structureに追加
+        foreach ($route as $branch) {
+            // 子タスクを配列で拾う
+            $tasks = $this->childTasksFormParentTaskId($branch);
+
+            // $structureに追加
+            $structure[] = $tasks;
+        }
+
+        return response()->json(['structure' => $structure, 'route' => $route]); //JSONデータをJavaScriptに渡す
     }
 
     /**
@@ -51,20 +92,7 @@ class TasksController extends Controller
      */
     public function getChildTasks($id)
     {
-        $parent_task_depth = TasksRelation::query()
-                                ->where('parent_task_id', '=', $id)
-                                ->whereColumn('parent_task_id', '=', 'child_task_id')
-                                ->first()
-                                ->depth;
-        $child_task_ids = TasksRelation::query()
-                            ->where('parent_task_id', '=', $id)
-                            ->where('depth', '=', $parent_task_depth)
-                            ->whereColumn('parent_task_id', '!=', 'child_task_id')
-                            ->pluck('child_task_id')
-                            ->toArray();
-        $child_tasks = Task::query()
-                        ->where('id', '=', $child_task_ids)
-                        ->get();
+        $child_tasks = $this->childTasksFormParentTaskId($id);
         return response()->json(['childTasks' => $child_tasks]); //JSONデータをJavaScriptに渡す
     }
 
@@ -199,7 +227,7 @@ class TasksController extends Controller
             return response()->json( $response, 422 );
         };
 
-                // 子があるか検証
+        // 子があるか検証
         $task_relations = TasksRelation::query()
                             ->where('parent_task_id', '=', $id)
                             ->get();
@@ -332,5 +360,40 @@ class TasksController extends Controller
             ->where('end_date', '>=', $start_date)
             ->where('start_date', '<=', $end_date)
             ->get(); 
+    }
+
+    // 呼び出しは$this->childTasksFormParentTaskId($id);
+    private function childTasksFormParentTaskId($parent_task_id)
+    {
+        // ユーザーを取得
+        $user = Auth::user();
+
+        // 親の深さを取得
+        $parent_task_depth = TasksRelation::query()
+                        ->where('parent_task_id', '=', $parent_task_id)
+                        ->whereColumn('parent_task_id', '=', 'child_task_id')
+                        ->first()
+                        ->depth;
+
+        // 親を$parent_task_idとする子のidsを取得
+        $candidate_task_ids = TasksRelation::query()
+                        ->where('depth', '=', $parent_task_depth)
+                        ->where('parent_task_id', '=', $parent_task_id)
+                        ->pluck('child_task_id')
+                        ->toArray();
+        // $candidate_task_idsの内、一つ深い階層に存在する子のidsを取得
+        $task_ids = TasksRelation::query()
+                        ->whereIn('parent_task_id', $candidate_task_ids)
+                        ->where('depth', '=', $parent_task_depth + 1)
+                        ->whereColumn('parent_task_id', '=', 'child_task_id')
+                        ->pluck('parent_task_id')
+                        ->toArray();
+        // userが所有し、かつ取得したidsに合致するtasksを取得
+        $tasks = Task::query()
+                        ->whereUserId($user->id)
+                        ->whereIn('id', $task_ids)
+                        ->get();
+
+        return $tasks;
     }
 }

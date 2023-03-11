@@ -37,10 +37,10 @@ export function closeATask(taskBtnTool) {
 
 
 export function editChildTasksColumns(taskBtnTool) {
-  const taskDepth = Number(taskBtnTool.dataset.depth);
-  const parentTaskId = Number(taskBtnTool.dataset.taskId);
-
   taskBtnTool.addEventListener('click', () => {
+    const taskDepth = Number(taskBtnTool.dataset.depth);
+    const parentTaskId = Number(taskBtnTool.dataset.taskId);
+
     const childTasksColumns = document.querySelectorAll(`.tasks-column`);
     childTasksColumns.forEach(childTasksColumn => {
       // 階層の深いタスク列を削除
@@ -58,51 +58,8 @@ export function editChildTasksColumns(taskBtnTool) {
       XHR.responseType = "json";
       XHR.send();
       XHR.onload = () => {
-        // htmlを用意
-        const html =`
-          <div class="col-4 tasks-column" data-depth="${taskDepth + 1}" data-parent-task-id=${taskBtnTool.dataset.taskId}>
-            <div class="column-only-tasks" data-depth="${taskDepth + 1}" data-parent-task-id=${taskBtnTool.dataset.taskId}>
-            </div>
-            <div class="col-md new-form-area" data-depth="${taskDepth + 1}">
-              <div class="card card-outline card-primary collapsed-card" data-depth="${taskDepth + 1}">
-                  <div class="card-header">
-                      <h3 class="card-title">新規登録</h3>
-                      <div class="card-tools">
-                          <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
-                          </button>
-                      </div>
-                  </div>
-                  <div class="card-body" style="display: none;">
-                      <form action="/tasks" method="post" data-depth="${taskDepth + 1}">
-                          <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
-                              <div class="form-group">
-                                  <label for="title">タイトル</label>
-                                  <input type="text" class="form-control" id="title" name="title"
-                                      placeholder="タスク名" />
-                              </div>
-                              <div class="form-group">
-                                  <label for="detail">詳細</label>
-                                  <textarea name="detail" id="detail" cols="30" rows="1.5"
-                                      placeholder="詳細" class="form-control form-text-area"></textarea>
-                              </div>
-                              <div class="form-group">
-                                  <label for="start_date">期限</label>
-                                  <input type="date" class="form-control" id="start_date" name="start_date"
-                                  />
-                              </div>
-                              <div class="row">
-                                  <div class="ml-auto">
-                                      <button type="submit" class="btn btn-primary btn-task btn-store" data-depth="${taskDepth + 1}">登録</button>
-                                  </div>
-                              </div>
-                      </form>
-                  </div>
-              </div>
-            </div>
-          </div>
-        `;
         // 並べる
-        childTasksColumns[0].parentElement.insertAdjacentHTML('beforeend', html);
+        childTasksColumns[0].parentElement.insertAdjacentHTML('beforeend', newTaskColumnHtml(taskDepth + 1, parentTaskId));
 
         // 新規登録ボタンを取得
         const storeButtons = document.querySelectorAll('.btn-store');
@@ -342,6 +299,58 @@ export function formatDateForForm(dt) {
   return (y + '-' + m + '-' + d);
 }
 
+// ------------------------------------▼html関連▼------------------------------------
+
+// 新たに表示するタスク一列
+// ※受けるdepthは新たな列のdepth
+export function newTaskColumnHtml(depth, parentTaskId) {
+  // htmlを用意
+  const html =`
+    <div class="col-4 tasks-column" data-depth="${depth}" data-parent-task-id=${parentTaskId}>
+      <div class="column-only-tasks" data-depth="${depth}" data-parent-task-id=${parentTaskId}>
+      </div>
+      <div class="col-md new-form-area" data-depth="${depth}">
+        <div class="card card-outline card-primary collapsed-card" data-depth="${depth}">
+            <div class="card-header">
+                <h3 class="card-title">新規登録</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body" style="display: none;">
+                <form action="/tasks" method="post" data-depth="${depth}">
+                    <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').getAttribute('content')}">
+                        <div class="form-group">
+                            <label for="title">タイトル</label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                placeholder="タスク名" />
+                        </div>
+                        <div class="form-group">
+                            <label for="detail">詳細</label>
+                            <textarea name="detail" id="detail" cols="30" rows="1.5"
+                                placeholder="詳細" class="form-control form-text-area"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="start_date">期限</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date"
+                            />
+                        </div>
+                        <div class="row">
+                            <div class="ml-auto">
+                                <button type="submit" class="btn btn-primary btn-task btn-store" data-depth="${depth}">登録</button>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  return html;
+};
+
 // 新たに表示するtask
 export function newTaskHtml(task, depth) {
 
@@ -420,7 +429,9 @@ export function newTaskHtml(task, depth) {
   return html;
 };
 
-export function buildNewTask(task, depth) {
+// ------------------------------------▲html関連▲------------------------------------
+
+export function buildNewTask(task) {
     // 各種イベントをセット
     // show_only_one_task.js
     const taskBtnTool = document.querySelector(`.task-btn-tool[data-task-id="${task.id}"]`);
@@ -436,3 +447,142 @@ export function buildNewTask(task, depth) {
     const deleteButton = document.querySelector(`.btn-delete[data-task-id="${task.id}"]`)
     destroyTask(deleteButton);
 };
+
+
+// ------------------------------------▼search関連▼------------------------------------
+
+export function constructSearchResults(tasks) {
+  let html = ``;
+  tasks.forEach(task => {
+    const startDate = (task.start_date == null) ? '' : new Date(task.start_date);
+    const startDateForIndex =  (startDate == '') ? 'なし' : formatDateForIndex(startDate);
+    html +=  `
+            <tr>
+                <td>
+                    ${task.title}
+                </td>
+                <td class="candidate-detail">
+                    ${task.detail}
+                </td>
+                <td>
+                    ${startDateForIndex}
+                </td>
+                <td>
+                    <a href="/tasks?selected_task=${task.id}" class="text-muted">
+                        <i class="fas fa-search"></i>
+                    </a>
+                </td>
+            </tr>`;
+  });
+  return html;
+}
+
+export function searchTasks(searchButton) {
+  searchButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    // url作成
+    const searchTerm = document.querySelector('input[name="adminlteSearch"]').value;
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const url = `/tasks/search?_token=${token}&adminlteSearch=${searchTerm}`;
+
+    const XHR = new XMLHttpRequest();
+    XHR.open("GET", url, true);
+    XHR.responseType = "json";
+    XHR.send(null);
+    XHR.onload = () => {
+      const response = XHR.response;
+      const tasks = response.tasks;
+      if (XHR.status === 422) {
+        // 検索語句が空だった時
+        alert(`${response.error}：${response.error_message}`);
+        return null;
+      }else if (XHR.status != 200) {
+        // その他レスポンスに失敗した時
+        alert(`Response Error ${XHR.status}: ${XHR.statusText}`);
+        return null;
+      };
+      const CandidateTBody = document.querySelector('#candidate-tbody');
+      CandidateTBody.innerHTML = constructSearchResults(tasks);
+      const candidateCard = document.querySelector('#candidate-card');
+      candidateCard.setAttribute('style', 'display: block;');
+    };
+  });
+}
+
+// ------------------------------------▲search関連▲------------------------------------
+
+// ------------------------------------▼全体を描画▼------------------------------------
+export function directOpenATask(taskId) {
+  const taskUnit = document.querySelector(`.task-unit[data-task-id="${taskId}"]`);
+  taskUnit.children[0].setAttribute('class', "card card-outline card-success");
+  taskUnit.children[0].children[0].children[1].children[0].dataset.condition = "open";
+  taskUnit.children[0].children[0].children[1].children[0].children[0].setAttribute('class', "fas fa-minus");
+  taskUnit.children[0].children[1].setAttribute('style', "display: block;");
+};
+
+export function drawTasks() {
+  // 展開適用範囲かを確認し、"individual-projects"でなければ終わり
+  const projectType = document.querySelector('meta[name="page-category"]').getAttribute('content');
+  if (projectType != "individual-projects") return null;
+
+  // ルートの要素を取得する(なくてもからの配列が与えられる)
+  const routeMeta = document.querySelectorAll('meta[name="selected-task-route"]');
+
+  // XHR送る準備
+  let route = [];
+  routeMeta.forEach(branch => {
+    route.push(Number(branch.getAttribute('content')));
+  });
+  const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  const url = `/tasks/construct?_token=${token}&route=${route}`;
+
+  const XHR = new XMLHttpRequest();
+  XHR.open("GET", url, true);
+  XHR.responseType = "json";
+  XHR.send();
+
+  XHR.onload = () => {
+    // 一列の差し込みエリアを取得
+    const columnInsertArea = document.querySelector('#tasks-all-container');
+
+    // タスク構造を定数structureに入れる
+    const structure = XHR.response.structure;
+
+    let i = 0;
+    let depth = 1;
+    const parentTaskIds = [0].concat(route);
+    structure.forEach(tasksInAColumn => {
+      // 一列のhtmlを差し込み
+      columnInsertArea.innerHTML = '';
+      columnInsertArea.insertAdjacentHTML('beforeend', newTaskColumnHtml(depth, parentTaskIds[i]));
+
+      // 差し込んだ列にtasks差し込み
+      tasksInAColumn.forEach(task => {
+        // タスクの差し込みエリアを取得
+        let taskInsertArea = document.querySelector(`.column-only-tasks[data-depth="${depth}"]`);
+        // 差し込み
+        taskInsertArea.insertAdjacentHTML('beforeend', newTaskHtml(task, depth));
+        // 各種イベントをセット
+        buildNewTask(task);
+
+        // route上のタスクの場合は開く
+        if (task.id === route[i]) {
+          directOpenATask(task.id);
+        }
+      });
+
+
+      i ++;
+      depth ++;
+    });
+
+    // 新規登録ボタンを取得
+    const storeButtons = document.querySelectorAll('.btn-store');
+    if (storeButtons.length == 0) return null;
+    // 新規登録ボタンにイベントをセット
+    storeButtons.forEach(storeButton => {
+      taskStore(storeButton);
+    });
+  };
+};
+// ------------------------------------▲全体を描画▲------------------------------------

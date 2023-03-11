@@ -5,6 +5,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 @stop
 
+@section('meta_tags')
+    <meta name="page-category" content="individual-calendar">
+@stop
+
 @section('title', 'スケジュール')
 
 @section('content_header')
