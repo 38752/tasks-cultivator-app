@@ -19,30 +19,10 @@ class TasksController extends Controller
     {
         // 自分のtasksを取得
         $user = Auth::user();
-        $project_ids = TasksRelation::query()
-                        ->where('depth', '=', 1)
-                        ->whereColumn('parent_task_id', '=', 'child_task_id')
-                        ->pluck('parent_task_id')
-                        ->toArray();
-        $projects = Task::whereUserId($user->id)
-                    ->whereIn('id', $project_ids)
-                    ->get();
-
-        // selected_task_relationsを取得
-        if ($request->input('selected_task') != null) {
-            $selected_task = $request->input('selected_task');
-            $selected_task_relations = TasksRelation::query()
-                                        ->where('child_task_id', '=', $selected_task)
-                                        ->orderBy('depth', 'asc')
-                                        ->get();
-        } else {
-            $selected_task_relations = [];
-        };
 
         return view(
             'task.index',
-            ['user' => $user, 'projects' => $projects,
-             'selected_task_relations' => $selected_task_relations]
+            ['user' => $user]
         );
     }
 
@@ -55,7 +35,19 @@ class TasksController extends Controller
     {
         // 自分のtasksを取得
         $user = Auth::user();
-        $route = $request->route == null ? [] : explode(',', $request->route);
+
+        // $route作成
+        if ($request->selected_task_id != null) {
+            $selected_task_id = $request->selected_task_id;
+            $route = TasksRelation::query()
+                                        ->where('child_task_id', '=', $selected_task_id)
+                                        ->orderBy('depth', 'asc')
+                                        ->pluck('parent_task_id')
+                                        ->toArray();
+        } else {
+            $route = [];
+        };
+
         $structure = []; // ここに必要な全てのタスクを入れる([depth_1の配列, depth_2の配列, ...])
 
         // まずプロジェクトを配列で拾う
