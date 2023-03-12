@@ -103,7 +103,7 @@ DB_HOSTを次のように設定します
 ```
 DB_HOST=mysql
 ```
-BASIC認証の挙動を確認する場合は下記のように設定します
+BASIC認証の挙動を確認する場合は次のように設定します
 ```
 BASIC_AUTH_ID="<ユーザー名>"
 BASIC_AUTH_PASS="<パスワード>"
