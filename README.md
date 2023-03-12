@@ -119,6 +119,10 @@ sail npm install
 ```
 sail npm run dev
 ```
+##### localhostにアクセス
+```
+http://localhost/
+```
 
 #### 停止させる場合
 ##### viteを停止
