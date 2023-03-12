@@ -75,56 +75,55 @@ PASS：1947
   - AWS/RDS(mySQL)
 
 # ローカルでの動作方法
-<--!### 以下のコマンドを順に実行-->
 #### ※Dockerがインストール済みであることを前提としています
-###### git cloneする(ターミナルで実行)
+##### git cloneする(ターミナルで実行)
 ターミナルで次のコマンドを実行
 ```
 git clone https://github.com/38752/tasks-cultivator-app.git
 ```
-###### プロジェクトディレクトリに移動
+##### プロジェクトディレクトリに移動
 ターミナルで次のコマンドを実行
 ```
 cd tasks-cultivator-app
 ```
-###### Composerのパッケージをインストール
+##### Composerのパッケージをインストール
 ターミナルで次のコマンドを実行
 ```
 docker run --rm -u "$(id -u):$(id -g)" -v $(pwd):/var/www/html -w /var/www/html laravelsail/php82-composer:latest composer install --ignore-platform-reqs
 ```
-###### Sailをバックグラウンドで起動
+##### Sailをバックグラウンドで起動
 ターミナルで次のコマンドを実行
 ```
 ./vendor/bin/sail up -d
 ```
-###### プロジェクト直下に.envファイルを作成し、環境変数を設定
+##### プロジェクト直下に.envファイルを作成し、環境変数を設定
 既に存在する.env.exampleファイルの名前を.envへ変更し使用しても構いません
-###### .envファイルを編集
+##### .envファイルを編集
 DB_HOSTを次のように設定します
 ```
 DB_HOST=mysql
 ```
-###### 環境変数APP_KEYを設定
+##### 環境変数APP_KEYを設定
 ```
 sail php artisan key:generate
 ```
-###### マイグレート
+##### マイグレート
 ```
 sail php artisan migrate
 ```
-###### npmをインストール
+##### npmをインストール
 ```
 sail npm install
 ```
-###### viteを起動
+##### viteを起動
 ```
 sail npm run dev
 ```
 
 #### 停止させる場合
-###### viteを停止
+##### viteを停止
 ターミナル上でcontrol + C
-###### Sailのコンテナを停止
+##### Sailのコンテナを停止
 ```
 ./vendor/bin/sail down
 ```
