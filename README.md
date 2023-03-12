@@ -103,6 +103,11 @@ DB_HOSTを次のように設定します
 ```
 DB_HOST=mysql
 ```
+BASIC認証の挙動を確認する場合は下記のように設定します
+```
+BASIC_AUTH_ID="<ユーザー名>"
+BASIC_AUTH_PASS="<パスワード>"
+```
 ##### 環境変数APP_KEYを設定
 ```
 sail php artisan key:generate
