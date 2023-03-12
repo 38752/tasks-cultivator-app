@@ -59,7 +59,7 @@ PASS：1947
 
 # 開発環境
 - フレームワーク
-  - Laravel
+  - Laravel Framework 9.50.2
 - タスク管理
   - GitHub
 - テキストエディタ
@@ -68,21 +68,25 @@ PASS：1947
   - HTML
   - CSS
   - JavaScript
-  - PHP
+  - PHP 8.2.3
 - デプロイ
   - AWS/EC2
   - AWS/RDS(mySQL)
 
 # ローカルでの動作方法
-以下のコマンドを順に実行
+### 以下のコマンドを順に実行
+#### ※Dockerをインストール済みの場合
+###### git cloneする
 ```
-git clone https://github.com/38752/pick_me_app
+git clone https://github.com/38752/tasks-cultivator-app.git
 ```
+###### プロジェクトディレクトリに移動
 ```
-cd pick_me_app
+cd tasks-cultivator-app
 ```
+###### パッケージのインストール
 ```
-bundle install
+docker run --rm -u "$(id -u):$(id -g)" -v $(pwd):/var/www/html -w /var/www/html laravelsail/php82-composer:latest composer install --ignore-platform-reqs
 ```
 ```
 yarn install
