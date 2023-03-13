@@ -7,6 +7,7 @@ import './update_task';
 import './delete_task';
 import './search_task';
 import './select_task';
+import './hide_navbar_search';
 
 import Alpine from 'alpinejs';
 
