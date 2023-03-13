@@ -550,6 +550,7 @@ export function directOpenATask(taskId) {
   taskUnit.children[0].children[0].children[1].children[0].dataset.condition = "open";
   taskUnit.children[0].children[0].children[1].children[0].children[0].setAttribute('class', "fas fa-minus");
   taskUnit.children[0].children[1].setAttribute('style', "display: block;");
+  taskUnit.children[0].children[2].setAttribute('style', "display: block;");
 };
 
 export function drawTasks(url) {
