@@ -1,6 +1,6 @@
 import { drawTasks } from './task_functions';
 
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
   // 展開適用範囲かを確認し、"individual-projects"でなければ終わり
   const projectType = document.querySelector('meta[name="page-category"]').getAttribute('content');
   if (projectType != "individual-projects") return null;

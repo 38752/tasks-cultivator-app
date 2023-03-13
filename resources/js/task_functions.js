@@ -1,10 +1,58 @@
 // 関数ごとにエクスポート
 
-export function closeATask(taskBtnTool) {
+// store_task.js
+export function taskStore(storeButton) {
+  storeButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    const form = storeButton.parentElement.parentElement.parentElement;
+    const formData = new FormData(form);
+
+    // タスクidをurlに乗せて送信
+    const newTaskDepth = Number(storeButton.dataset.depth);
+    const parentTaskId = (newTaskDepth > 1) ? document.querySelector(`div[class="col-4 tasks-column"][data-depth="${newTaskDepth}"]`).dataset.parentTaskId : '0';
+    const url = `/tasks?parent_task_id=${parentTaskId}`;
+
+    const XHR = new XMLHttpRequest();
+    XHR.open("POST", url, true);
+    XHR.responseType = "json";
+    XHR.send(formData);
+    XHR.onload = () => {
+      if (XHR.status === 422) {
+        // バリデーションで引っかかった時
+        let errors = XHR.response.errors;
+        for (let key in errors) {
+          alert(`${XHR.response.statusText}: ${errors[key][0]}`);
+        };
+        return null;
+      }else if (XHR.status != 200) {
+        // その他レスポンスに失敗した時
+        alert(`Response Error ${XHR.status}: ${XHR.statusText}`);
+        return null;
+      };
+
+      // フォームを初期状態に戻す
+      const depth = XHR.response.selfRelation.depth;
+      form.reset();
+
+      // 作成したタスクを差し込み
+      const task = XHR.response.success.task;
+
+      // 差し込みエリアを取得、差し込み
+      const insertArea = document.querySelector(`.column-only-tasks[data-depth="${depth}"]`);
+      insertArea.insertAdjacentHTML('beforeend', newTaskHtml(task, depth));
+
+      buildNewTask(task);
+    };
+  });
+};
+
+
+export function closeATask(task) {
   // show_only_one_task.js
   // forEachの中身(開いているタスクを閉じる)
+  const taskId = task.id;
+  const taskBtnTool = document.querySelector(`.task-btn-tool[data-task-id="${taskId}"]`);
 
-  const taskId = taskBtnTool.dataset.taskId;
   const taskDepth = Number(taskBtnTool.dataset.depth);
 
   taskBtnTool.addEventListener('click', () => {
@@ -36,7 +84,9 @@ export function closeATask(taskBtnTool) {
 };
 
 
-export function editChildTasksColumns(taskBtnTool) {
+export function editChildTasksColumns(task) {
+  const taskBtnTool = document.querySelector(`.task-btn-tool[data-task-id="${task.id}"]`);
+
   taskBtnTool.addEventListener('click', () => {
     const taskDepth = Number(taskBtnTool.dataset.depth);
     const parentTaskId = Number(taskBtnTool.dataset.taskId);
@@ -91,13 +141,17 @@ export function editChildTasksColumns(taskBtnTool) {
   });
 };
 
+
 // edit_task.js
 // forEachの中身
-export function displayOrRemoveEditForm(editButton) {
+export function displayOrHideEditForm(task) {
+  // ボタンを取得
+  const taskId = task.id;
+  const editButton = document.querySelector(`.btn-edit[data-task-id="${taskId}"]`);
+
   // ボタンにイベントをセット
   editButton.addEventListener('click', () => {
     // idの一致するフォームを探す
-    const taskId = editButton.dataset.taskId;
     const editForm = document.querySelector(`.edit-form[data-task-id="${taskId}"]`);
 
     // blockなら非表示、noneなら表示
@@ -110,58 +164,14 @@ export function displayOrRemoveEditForm(editButton) {
   });
 };
 
-// store_task.js
-export function taskStore(storeButton) {
-  storeButton.addEventListener('click', (e) => {
-    e.preventDefault();
-    const form = storeButton.parentElement.parentElement.parentElement;
-    const formData = new FormData(form);
-
-    // タスクidをurlに乗せて送信
-    const newTaskDepth = Number(storeButton.dataset.depth);
-    const parentTaskId = (newTaskDepth > 1) ? document.querySelector(`div[class="col-4 tasks-column"][data-depth="${newTaskDepth}"]`).dataset.parentTaskId : '0';
-    const url = `/tasks?parent_task_id=${parentTaskId}`;
-
-    const XHR = new XMLHttpRequest();
-    XHR.open("POST", url, true);
-    XHR.responseType = "json";
-    XHR.send(formData);
-    XHR.onload = () => {
-      if (XHR.status === 422) {
-        // バリデーションで引っかかった時
-        let errors = XHR.response.errors;
-        for (let key in errors) {
-          alert(`${XHR.response.statusText}: ${errors[key][0]}`);
-        };
-        return null;
-      }else if (XHR.status != 200) {
-        // その他レスポンスに失敗した時
-        alert(`Response Error ${XHR.status}: ${XHR.statusText}`);
-        return null;
-      };
-
-      // フォームを初期状態に戻す
-      const depth = XHR.response.selfRelation.depth;
-      const formArea = document.querySelector(`.new-form-area[data-depth="${depth}"]`);
-      form.reset();
-
-      // 作成したタスクを差し込み
-      const task = XHR.response.success.task;
-
-      // 差し込みエリアを取得、差し込み
-      const insertArea = document.querySelector(`.column-only-tasks[data-depth="${depth}"]`);
-      insertArea.insertAdjacentHTML('beforeend', newTaskHtml(task, depth));
-
-      buildNewTask(task);
-    };
-  });
-};
 
 // update_task.js
-export function updateTask(updateButton) {
+export function updateTask(task) {
+  const taskId = task.id;
+  const updateButton = document.querySelector(`.btn-update[data-task-id="${taskId}"]`);
+
   updateButton.addEventListener('click', (e) => {
     e.preventDefault();
-    const taskId = updateButton.dataset.taskId;
     const form = updateButton.parentElement.parentElement.parentElement;
     const formData = new FormData(form);
     const XHR = new XMLHttpRequest();
@@ -188,9 +198,6 @@ export function updateTask(updateButton) {
       // 各項目を入れ直す
       const task = XHR.response.success.task;
 
-      // taskIdを取得
-      const taskId = task.id;
-
       // 日付を'yyyy年mm月dd日'にする
       if (task.start_date == null) {
         var startDate = 'なし';
@@ -213,10 +220,12 @@ export function updateTask(updateButton) {
 }
 
 // delete_task.js
-export function destroyTask(deleteButton) {
+export function destroyTask(task) {
+  const taskId = task.id;
+  const deleteButton = document.querySelector(`.btn-delete[data-task-id="${taskId}"]`);
+
   deleteButton.addEventListener('click', (e) => {
     e.preventDefault();
-    const taskId = deleteButton.dataset.taskId;
     const form = deleteButton.parentElement;
     const formData = new FormData(form);
     // 先にXHR送ってだめだったら終わり、
@@ -433,19 +442,19 @@ export function newTaskHtml(task, depth) {
 
 export function buildNewTask(task) {
     // 各種イベントをセット
+
     // show_only_one_task.js
-    const taskBtnTool = document.querySelector(`.task-btn-tool[data-task-id="${task.id}"]`);
-    closeATask(taskBtnTool);
-    editChildTasksColumns(taskBtnTool);
+    closeATask(task);
+    editChildTasksColumns(task);
+
     // edit_task.js
-    const editButton = document.querySelector(`.btn-edit[data-task-id="${task.id}"]`);
-    displayOrRemoveEditForm(editButton);
+    displayOrHideEditForm(task);
+
     // update_task.js
-    const updateButton = document.querySelector(`.btn-update[data-task-id="${task.id}"]`)
-    updateTask(updateButton);
+    updateTask(task);
+
     // delete_task.js
-    const deleteButton = document.querySelector(`.btn-delete[data-task-id="${task.id}"]`)
-    destroyTask(deleteButton);
+    destroyTask(task);
 };
 
 
