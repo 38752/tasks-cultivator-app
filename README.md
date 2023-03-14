@@ -70,7 +70,6 @@ PASS：1947
 ![画面遷移図](https://gyazo.com/c195bddb9e31a5014bde4b6af57d1fd6/raw)
 
 # 開発環境
-#### ※Dockerをインストール済みであることを前提としています
 - フレームワーク
   - Laravel Framework 9.50.2
 - タスク管理
