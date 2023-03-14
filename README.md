@@ -52,7 +52,7 @@ PASS：1947
 
 # データベース設計
 
-## users テーブル(Laravel Breezeを使用)
+## users テーブル(Laravel Breeze使用)
 
 | Column             | Type    | Options                    |
 | ------------------ | ------- | -------------------------- |
