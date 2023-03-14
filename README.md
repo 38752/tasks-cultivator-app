@@ -52,18 +52,33 @@ PASS：1947
 
 # データベース設計
 
-## users テーブル
+## users テーブル(Laravel Breezeを使用)
 
 | Column             | Type    | Options                    |
 | ------------------ | ------- | -------------------------- |
-| email              | string  | null: false, unique: true  |
-| encrypted_password | string  | null: false                |
-| nickname           | string  | null: false                |
-| how_old_id         | integer | null: false                |
-| sex_id             | integer | null: false                |
-| introduction       | text    |                            |
-| status_id          | integer | null: false, default: 1000 |
+| name               | string  |                            |
+| email              | string  | unique()                   |
+| password           | string  |                            |
 
+
+## tasks テーブル
+
+| Column             | Type    | Options                    |
+| ------------------ | ------- | -------------------------- |
+| user_id            | integer | nullable(false)            |
+| title              | string  | nullable(false)            |
+| detail             | text    | nullable(false)            |
+| start_date         | date    | nullable()                 |
+| end_date           | date    | nullable()                 |
+
+
+## tasks_relations テーブル
+
+| Column             | Type    | Options                    |
+| ------------------ | ------- | -------------------------- |
+| parent_task_id     | integer | nullable(false)            |
+| child_task_id      | integer | nullable(false)            |
+| depth              | integer | nullable(false)            |
 
 
 # 画面遷移図
