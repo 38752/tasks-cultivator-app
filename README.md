@@ -125,11 +125,11 @@ docker run --rm -u "$(id -u):$(id -g)" -v $(pwd):/var/www/html -w /var/www/html 
 ##### プロジェクト直下に.envファイルを作成し、環境変数を設定
 既に存在する.env.exampleファイルの名前を.envへ変更し使用しても構いません
 ##### .envファイルを編集
-DB_HOSTを次のように設定します
+DB_HOSTを次のように設定
 ```
 DB_HOST=mysql
 ```
-BASIC認証の挙動を確認する場合は次のように設定します
+BASIC認証の挙動を確認する場合は次のように設定
 ```
 BASIC_AUTH_ID="<ユーザー名>"
 BASIC_AUTH_PASS="<パスワード>"
