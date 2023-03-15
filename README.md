@@ -111,7 +111,7 @@ https://docs.google.com/spreadsheets/d/1j_OhzSkQo5UEQwoCwrh7HHS1flUOlkiP4rHf3KP8
 
 
 # 画面遷移図
-![画面遷移図](https://gyazo.com/c195bddb9e31a5014bde4b6af57d1fd6/raw)
+![画面遷移図](https://gyazo.com/7ba9049a6348bdb30c8abd16bdff2857/raw)
 
 # 開発環境
 - フレームワーク
