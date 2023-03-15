@@ -41,14 +41,43 @@ PASS：1947
 https://docs.google.com/spreadsheets/d/1j_OhzSkQo5UEQwoCwrh7HHS1flUOlkiP4rHf3KP8fLA/edit#gid=0
 
 # 実装した機能についての画像やGIFおよびその説明
-- 項目
-![画像の説明](https://gyazo.com/db272dfbde173ccfbebb443e72c1a8bd/raw)
+- 新規登録できる
+![新規登録](https://gyazo.com/e445385d02b1ef7b3de9739d1cdbc385/raw)
+
+- ログインできる
+![ログイン](https://gyazo.com/590b61c7baf417892fcd53adc924887d/raw)
+
+- タスクを登録できる(プロジェクトタスク)
+![プロジェクトタスク登録](https://gyazo.com/2092f2ac17ed1b15ed19ad57295e03c2/raw)
+
+- タスクを登録できる(子タスク)
+![子タスク登録](https://gyazo.com/7a8bdfa3d322a18264de55447442e3f1/raw)
+
+- タスクを排他的に展開する
+![排他的展開](https://gyazo.com/0fe3e0bcd09268986bb27a12601b4c17/raw)
+
+- タスクを編集・更新できる
+![タスク編集・更新](https://gyazo.com/fdb3c024be87fe8998f9f46e1528fd02/raw)
+
+- タスクを削除できる
+![タスク削除](https://gyazo.com/06cbcb254e402b1621c9cfe1d1dbceea/raw)
+
+- タスクを検索できる
+![タスク検索](https://gyazo.com/3f9224c436e362be1ab449ac9234ee97/raw)
+
+- 検索結果のタスクを選択すると展開された状態で表示できる
+![タスク選択](https://gyazo.com/d80b56b484eeb72b03fcd0f2def7c6af/raw)
+
+- 期限を設定したタスクはカレンダーに表示される
+![カレンダー表示](https://gyazo.com/88175874a67eb0745da29ad0f2f45211/raw)
 
 
-
-# 実装予定の機能
-- 項目①
-- 項目②
+# 実装予定の機能・仕様
+- 「完了」アクションと「削除」アクションを分割する
+    - 「完了」の場合はDB上でタスクを削除せず、編集できない状態にする
+    - 「削除」の場合はDBから当該のレコードを削除する
+- タスクの完了率を表示する機能
+- DOM上で列が削除された際に表示がカクカクしないようにする
 
 # データベース設計
 
