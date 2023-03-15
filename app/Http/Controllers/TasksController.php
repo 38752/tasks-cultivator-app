@@ -59,6 +59,7 @@ class TasksController extends Controller
         $projects = Task::query()
                         ->whereUserId($user->id)
                         ->whereIn('id', $project_ids)
+                        ->orderBy('created_at', 'asc')
                         ->get();
 
         // $structureに追加
@@ -214,17 +215,13 @@ class TasksController extends Controller
         // ユーザー認証
         $user = Auth::user();
         if ($task->user_id != $user->id) {
-            $response['statusText']  = 'Unauthorized Error';
+            $response['statusText']  = 'Authorization Error';
             $response['errors']  = ['user' => ['The user must not be different from the registrant.']];
             return response()->json( $response, 422 );
         };
 
         // 子があるか検証
-        $task_relations = TasksRelation::query()
-                            ->where('parent_task_id', '=', $id)
-                            ->get();
-        $task_relations_count = $task_relations->count();
-        if ($task_relations_count > 1) {
+        if ($this->countChildTasks($id) > 1) {
             $response['statusText']  = 'Consistency Error';
             $response['errors']  = ['Undeletable task' => ['It is unable to delete tasks having children.']];
             return response()->json( $response, 422 );
@@ -234,6 +231,9 @@ class TasksController extends Controller
         $task->delete();
 
         // 関係も削除
+        $task_relations = TasksRelation::query()
+                            ->where('child_task_id', '=', $id)
+                            ->get();
         foreach ($task_relations as $task_relation) {
             $task_relation->delete();
         }
@@ -265,11 +265,7 @@ class TasksController extends Controller
         };
 
         // 子があるか検証
-        $task_relations = TasksRelation::query()
-                            ->where('parent_task_id', '=', $id)
-                            ->get();
-        $task_relations_count = $task_relations->count();
-        if ($task_relations_count > 1) {
+        if ($this->countChildTasks($id) > 1) {
             $response['statusText']  = 'integrity Error';
             $response['errors']  = ['Undeletable task' => ['It is unable to delete tasks having children.']];
             return response()->json( $response, 422 );
@@ -384,8 +380,18 @@ class TasksController extends Controller
         $tasks = Task::query()
                         ->whereUserId($user->id)
                         ->whereIn('id', $task_ids)
+                        ->orderBy('created_at', 'asc')
                         ->get();
 
         return $tasks;
+    }
+
+    private function countChildTasks($id)
+    {
+        // 子の数を出力
+        $child_tasks_count = TasksRelation::query()
+                                ->where('parent_task_id', '=', $id)
+                                ->count();
+        return $child_tasks_count;
     }
 }
