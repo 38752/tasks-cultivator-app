@@ -38,7 +38,7 @@ PASS：1947
 
 
 # 洗い出した要件
-
+https://docs.google.com/spreadsheets/d/1j_OhzSkQo5UEQwoCwrh7HHS1flUOlkiP4rHf3KP8fLA/edit#gid=0
 
 # 実装した機能についての画像やGIFおよびその説明
 - 項目
