@@ -68,7 +68,7 @@ class TasksController extends Controller
         // 順に子タスクを配列で拾って$structureに追加
         foreach ($route as $branch) {
             // 子タスクを配列で拾う
-            $tasks = $this->childTasksFormParentTaskId($branch);
+            $tasks = $this->getChildTasksFromParentTaskId($branch);
 
             // $structureに追加
             $structure[] = $tasks;
@@ -85,7 +85,7 @@ class TasksController extends Controller
      */
     public function getChildTasks($id)
     {
-        $child_tasks = $this->childTasksFormParentTaskId($id);
+        $child_tasks = $this->getChildTasksFromParentTaskId($id);
         return response()->json(['childTasks' => $child_tasks]); //JSONデータをJavaScriptに渡す
     }
 
@@ -350,8 +350,8 @@ class TasksController extends Controller
             ->get(); 
     }
 
-    // 呼び出しは$this->childTasksFormParentTaskId($id);
-    private function childTasksFormParentTaskId($parent_task_id)
+    // 呼び出しは$this->getChildTasksFromParentTaskId($id);
+    private function getChildTasksFromParentTaskId($parent_task_id)
     {
         // ユーザーを取得
         $user = Auth::user();
